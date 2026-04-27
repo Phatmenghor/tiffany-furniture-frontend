@@ -129,14 +129,14 @@ export default function LoginPage() {
               By signing in, you agree to our{" "}
               <a
                 href="#"
-                className="text-primary hover:text-primary/80 font-medium"
+                className="text-primary hover:opacity-80 font-medium transition-opacity"
               >
                 Terms of Service
               </a>{" "}
               and{" "}
               <a
                 href="#"
-                className="text-primary hover:text-primary/80 font-medium"
+                className="text-primary hover:opacity-80 font-medium transition-opacity"
               >
                 Privacy Policy
               </a>

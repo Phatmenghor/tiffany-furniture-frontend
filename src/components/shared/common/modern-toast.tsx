@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { CSSProperties } from 'react';
+import { useBusinessColors } from '@/hooks/use-business-colors';
 
 interface ModernToastProps {
   type: 'success' | 'error' | 'warning' | 'info' | 'order' | 'payment' | 'user' | 'validation';
@@ -33,89 +34,57 @@ export function ModernToastContent({
   details,
   validationData,
 }: ModernToastProps) {
-  const getBgColor = () => {
+  const { primary } = useBusinessColors();
+
+  const getTypeColor = () => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 border-green-300';
+        return { bg: '#dcfce7', border: '#86efac', text: '#166534', left: '#22c55e' };
       case 'error':
-        return 'bg-red-50 border-red-300';
+        return { bg: '#fee2e2', border: '#fca5a5', text: '#7f1d1d', left: '#ef4444' };
       case 'warning':
-        return 'bg-yellow-50 border-yellow-300';
+        return { bg: '#fef3c7', border: '#fcd34d', text: '#92400e', left: '#eab308' };
       case 'info':
-        return 'bg-blue-50 border-blue-300';
+        return { bg: '#dbeafe', border: '#93c5fd', text: '#0c2d6b', left: '#3b82f6' };
       case 'order':
-        return 'bg-purple-50 border-purple-300';
+        return { bg: '#f3e8ff', border: '#ddd6fe', text: '#4c1d95', left: primary };
       case 'payment':
-        return 'bg-emerald-50 border-emerald-300';
+        return { bg: '#d1fae5', border: '#a7f3d0', text: '#065f46', left: '#10b981' };
       case 'user':
-        return 'bg-indigo-50 border-indigo-300';
+        return { bg: '#e0e7ff', border: '#c7d2fe', text: '#312e81', left: primary };
       case 'validation':
         return validationData?.status === 'SUCCESS'
-          ? 'bg-green-50 border-green-300'
-          : 'bg-orange-50 border-orange-300';
+          ? { bg: '#dcfce7', border: '#86efac', text: '#166534', left: '#22c55e' }
+          : { bg: '#fed7aa', border: '#fdba74', text: '#7c2d12', left: '#f97316' };
       default:
-        return 'bg-gray-50 border-gray-300';
+        return { bg: '#f3f4f6', border: '#d1d5db', text: '#111827', left: primary };
     }
   };
 
-  const getTitleColor = () => {
-    switch (type) {
-      case 'success':
-        return 'text-green-900';
-      case 'error':
-        return 'text-red-900';
-      case 'warning':
-        return 'text-yellow-900';
-      case 'info':
-        return 'text-blue-900';
-      case 'order':
-        return 'text-purple-900';
-      case 'payment':
-        return 'text-emerald-900';
-      case 'user':
-        return 'text-indigo-900';
-      case 'validation':
-        return validationData?.status === 'SUCCESS'
-          ? 'text-green-900'
-          : 'text-orange-900';
-      default:
-        return 'text-gray-900';
-    }
+  const typeColor = getTypeColor();
+
+  const containerStyle: CSSProperties = {
+    backgroundColor: typeColor.bg,
+    borderColor: typeColor.border,
+    borderLeft: `4px solid ${typeColor.left}`,
+    borderTop: `1px solid ${typeColor.border}`,
+    borderRight: `1px solid ${typeColor.border}`,
+    borderBottom: `1px solid ${typeColor.border}`,
   };
 
-  const getBorderLeftColor = () => {
-    switch (type) {
-      case 'success':
-        return 'border-l-green-500';
-      case 'error':
-        return 'border-l-red-500';
-      case 'warning':
-        return 'border-l-yellow-500';
-      case 'info':
-        return 'border-l-blue-500';
-      case 'order':
-        return 'border-l-purple-500';
-      case 'payment':
-        return 'border-l-emerald-500';
-      case 'user':
-        return 'border-l-indigo-500';
-      case 'validation':
-        return validationData?.status === 'SUCCESS'
-          ? 'border-l-green-500'
-          : 'border-l-orange-500';
-      default:
-        return 'border-l-gray-500';
-    }
+  const titleStyle: CSSProperties = {
+    color: typeColor.text,
   };
 
   return (
     <div
-      className={`${getBgColor()} ${getBorderLeftColor()} border-l-4 border-t border-r border-b rounded-md p-4 w-96 shadow-lg`}
+      style={containerStyle}
+      className="rounded-md p-4 w-96 shadow-lg"
     >
       {/* Header with Title and ID */}
-      <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-200">
+      <div className="flex justify-between items-start mb-3 pb-3" style={{ borderBottomColor: typeColor.border, borderBottom: '1px solid' }}>
         <div className="flex-1">
-          <h4 className={`${getTitleColor()} font-semibold text-base leading-tight`}>
+          <h4 style={titleStyle} className="font-semibold text-base leading-tight">
             {title}
           </h4>
         </div>
@@ -128,68 +97,68 @@ export function ModernToastContent({
 
       {/* Validation Data if provided */}
       {validationData && (
-        <div className="border-t border-gray-200 pt-3 mb-3">
+        <div style={{ borderTopColor: typeColor.border, borderTop: '1px solid' }} className="pt-3 mb-3">
           <div className="space-y-2">
             <div className="flex justify-between text-xs mb-2">
-              <span className="text-gray-600 font-medium">NID:</span>
-              <span className="text-gray-800 font-mono">{validationData.nid}</span>
+              <span style={{ color: typeColor.text }} className="font-medium">NID:</span>
+              <span style={{ color: typeColor.text }} className="font-mono">{validationData.nid}</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className="text-gray-600 font-medium">Score:</span>
-              <span className="text-gray-800 font-mono">{validationData.score}</span>
+              <span style={{ color: typeColor.text }} className="font-medium">Score:</span>
+              <span style={{ color: typeColor.text }} className="font-mono">{validationData.score}</span>
             </div>
             {validationData.incorrectFields && validationData.incorrectFields.length > 0 && (
               <div className="text-xs mt-2">
-                <span className="text-gray-600 font-medium">Incorrect Fields:</span>
-                <ul className="list-disc list-inside text-gray-700">
+                <span style={{ color: typeColor.text }} className="font-medium">Incorrect Fields:</span>
+                <ul className="list-disc list-inside">
                   {validationData.incorrectFields.map((field, idx) => (
-                    <li key={idx} className="text-xs text-gray-700">{field}</li>
+                    <li key={idx} style={{ color: typeColor.text }} className="text-xs">{field}</li>
                   ))}
                 </ul>
               </div>
             )}
-            <div className="border-t border-gray-200 pt-2 mt-2">
+            <div style={{ borderTopColor: typeColor.border, borderTop: '1px solid' }} className="pt-2 mt-2">
               <div className="text-xs space-y-1">
                 {validationData.nameKH && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Name KH:</span>
-                    <span className="text-gray-800">{validationData.nameKH}</span>
+                    <span style={{ color: typeColor.text }}className="opacity-70">Name KH:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.nameKH}</span>
                   </div>
                 )}
                 {validationData.nameEN && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Name EN:</span>
-                    <span className="text-gray-800">{validationData.nameEN}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">Name EN:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.nameEN}</span>
                   </div>
                 )}
                 {validationData.dob && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">DOB:</span>
-                    <span className="text-gray-800">{validationData.dob}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">DOB:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.dob}</span>
                   </div>
                 )}
                 {validationData.gender && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Gender:</span>
-                    <span className="text-gray-800">{validationData.gender}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">Gender:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.gender}</span>
                   </div>
                 )}
                 {validationData.issued && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Issued:</span>
-                    <span className="text-gray-800">{validationData.issued}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">Issued:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.issued}</span>
                   </div>
                 )}
                 {validationData.expired && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Expired:</span>
-                    <span className="text-gray-800">{validationData.expired}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">Expired:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.expired}</span>
                   </div>
                 )}
                 {validationData.phoneNumber && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Phone:</span>
-                    <span className="text-gray-800">{validationData.phoneNumber}</span>
+                    <span style={{ color: typeColor.text }} className="opacity-70">Phone:</span>
+                    <span style={{ color: typeColor.text }}>{validationData.phoneNumber}</span>
                   </div>
                 )}
               </div>
@@ -200,12 +169,12 @@ export function ModernToastContent({
 
       {/* Regular Details if provided */}
       {details && Object.keys(details).length > 0 && !validationData && (
-        <div className="border-t border-gray-200 pt-3 mb-3">
+        <div style={{ borderTopColor: typeColor.border, borderTop: '1px solid' }} className="pt-3 mb-3">
           <div className="grid grid-cols-1 gap-2">
             {Object.entries(details).map(([key, value]) => (
               <div key={key} className="flex justify-between text-xs">
-                <span className="text-gray-600 font-medium">{key}:</span>
-                <span className="text-gray-800 font-mono">{String(value)}</span>
+                <span style={{ color: typeColor.text }} className="font-medium">{key}:</span>
+                <span style={{ color: typeColor.text }} className="font-mono">{String(value)}</span>
               </div>
             ))}
           </div>
@@ -213,10 +182,10 @@ export function ModernToastContent({
       )}
 
       {/* Footer with Timestamp */}
-      <div className="border-t border-gray-200 pt-2 mt-3">
+      <div style={{ borderTopColor: typeColor.border, borderTop: '1px solid' }} className="pt-2 mt-3">
         <div className="flex justify-between text-xs">
-          <span className="text-gray-500">Time</span>
-          <span className="text-gray-700 text-xs">{timestamp}</span>
+          <span style={{ color: typeColor.text, opacity: 0.7 }}>Time</span>
+          <span style={{ color: typeColor.text }} className="text-xs">{timestamp}</span>
         </div>
       </div>
     </div>
