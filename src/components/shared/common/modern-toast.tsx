@@ -1,6 +1,6 @@
 'use client';
 
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { useBusinessColors } from '@/hooks/use-business-colors';
 
 interface ModernToastProps {
@@ -35,6 +35,16 @@ export function ModernToastContent({
   validationData,
 }: ModernToastProps) {
   const { primary } = useBusinessColors();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const getTypeColor = () => {
     switch (type) {
@@ -75,6 +85,19 @@ export function ModernToastContent({
   const titleStyle: CSSProperties = {
     color: typeColor.text,
   };
+
+  if (isMobile) {
+    return (
+      <div
+        style={containerStyle}
+        className="rounded-md px-3 py-2 shadow-lg max-w-[90vw]"
+      >
+        <p className="text-gray-700 text-xs leading-relaxed">
+          {message}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
