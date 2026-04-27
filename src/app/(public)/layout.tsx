@@ -52,7 +52,10 @@ export default function PublicLayout({
       <Navbar />
 
       {/* Extra bottom padding on mobile so content clears the fixed bottom nav */}
-      <main className="flex-1 pb-16 sm:pb-0">
+      <main
+        className="flex-1 pb-24 sm:pb-0"
+        style={{ paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + 6rem)` }}
+      >
         <Suspense>{children}</Suspense>
       </main>
 
