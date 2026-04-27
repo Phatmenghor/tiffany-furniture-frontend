@@ -1,0 +1,161 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { LocationState } from "../models/type/location-type";
+import {
+  fetchAllLocationsService,
+  createLocationService,
+  updateLocationService,
+  deleteLocationService,
+  fetchDefaultLocationService,
+} from "../thunks/location-thunks";
+
+const initialState: LocationState = {
+  data: null,
+  locations: [],
+  defaultLocation: null,
+  pagination: {
+    currentPage: 1,
+    pageSize: 6,
+    hasMore: false,
+    isInitialLoaded: false,
+  },
+  isLoading: {
+    fetch: false,
+    create: false,
+    update: false,
+    delete: false,
+  },
+  error: null,
+  operations: {
+    isCreating: false,
+    isUpdating: false,
+    isDeleting: false,
+  },
+};
+
+const locationSlice = createSlice({
+  name: "location",
+  initialState,
+  reducers: {
+    clearLocationError: (state) => {
+      state.error = null;
+    },
+    resetLocationState: () => initialState,
+  },
+  extraReducers: (builder) => {
+    // Fetch all
+    builder
+      .addCase(fetchAllLocationsService.pending, (state) => {
+        state.isLoading.fetch = true;
+        state.error = null;
+      })
+      .addCase(fetchAllLocationsService.fulfilled, (state, action) => {
+        state.isLoading.fetch = false;
+        state.data = action.payload;
+        const newLocations = action.payload?.content || [];
+        const pageNo = (action.meta.arg as any)?.pageNo || 1;
+        const pageSize = (action.meta.arg as any)?.pageSize || state.pagination.pageSize;
+
+        // First page: replace, subsequent pages: append
+        if (pageNo === 1) {
+          state.locations = newLocations;
+        } else {
+          state.locations.push(...newLocations);
+        }
+
+        state.pagination.currentPage = pageNo;
+        state.pagination.pageSize = pageSize;
+        // hasMore is true if the number of items loaded is less than total items
+        const totalElements = action.payload?.totalElements || 0;
+        state.pagination.hasMore = state.locations.length < totalElements;
+        state.pagination.isInitialLoaded = true;
+      })
+      .addCase(fetchAllLocationsService.rejected, (state, action) => {
+        state.isLoading.fetch = false;
+        state.error = (action.payload as string) || "Failed to fetch locations";
+      });
+
+    // Create
+    builder
+      .addCase(createLocationService.pending, (state) => {
+        state.isLoading.create = true;
+        state.operations.isCreating = true;
+        state.error = null;
+      })
+      .addCase(createLocationService.fulfilled, (state, action) => {
+        state.isLoading.create = false;
+        state.operations.isCreating = false;
+        const newLocation = action.payload;
+
+        // If new location is default, remove default from others
+        if (newLocation.isDefault) {
+          state.locations = state.locations.map((loc) => ({
+            ...loc,
+            isDefault: false,
+          }));
+        }
+        state.locations = [newLocation, ...state.locations];
+      })
+      .addCase(createLocationService.rejected, (state, action) => {
+        state.isLoading.create = false;
+        state.operations.isCreating = false;
+        state.error = (action.payload as string) || "Failed to create location";
+      });
+
+    // Update
+    builder
+      .addCase(updateLocationService.pending, (state) => {
+        state.isLoading.update = true;
+        state.operations.isUpdating = true;
+        state.error = null;
+      })
+      .addCase(updateLocationService.fulfilled, (state, action) => {
+        state.isLoading.update = false;
+        state.operations.isUpdating = false;
+        const updated = action.payload;
+        if (updated.isDefault) {
+          state.locations = state.locations.map((loc) => ({
+            ...loc,
+            isDefault: loc.id === updated.id,
+          }));
+        }
+        state.locations = state.locations.map((loc) =>
+          loc.id === updated.id ? updated : loc
+        );
+      })
+      .addCase(updateLocationService.rejected, (state, action) => {
+        state.isLoading.update = false;
+        state.operations.isUpdating = false;
+        state.error = (action.payload as string) || "Failed to update location";
+      });
+
+    // Delete
+    builder
+      .addCase(deleteLocationService.pending, (state) => {
+        state.isLoading.delete = true;
+        state.operations.isDeleting = true;
+        state.error = null;
+      })
+      .addCase(deleteLocationService.fulfilled, (state, action) => {
+        state.isLoading.delete = false;
+        state.operations.isDeleting = false;
+        const deleted = action.payload;
+        state.locations = state.locations.filter(
+          (loc) => loc.id !== deleted.id
+        );
+      })
+      .addCase(deleteLocationService.rejected, (state, action) => {
+        state.isLoading.delete = false;
+        state.operations.isDeleting = false;
+        state.error = (action.payload as string) || "Failed to delete location";
+      });
+
+    // Fetch default
+    builder
+      .addCase(fetchDefaultLocationService.fulfilled, (state, action) => {
+        state.defaultLocation = action.payload;
+      });
+  },
+});
+
+export const { clearLocationError, resetLocationState } = locationSlice.actions;
+export default locationSlice.reducer;
