@@ -80,7 +80,7 @@ export const CustomButton = React.forwardRef<
         type={isFormSubmitButton ? "submit" : type}
         onClick={handleClick}
         disabled={isDisabled}
-        className={cn(isFormSubmitButton && "min-w-[120px] transition-all", className)}
+        className={cn("transition-all sm:min-w-[120px]", isFormSubmitButton && "w-full sm:w-auto", className)}
         {...props}
       >
         {buttonContent}
