@@ -90,7 +90,7 @@ export function ModernToastContent({
     return (
       <div
         style={containerStyle}
-        className="rounded-md px-3 py-2 shadow-lg max-w-[90vw]"
+        className="rounded-md px-3 py-2 shadow-lg max-w-[90vw] mx-auto pointer-events-auto"
       >
         <p className="text-gray-700 text-xs leading-relaxed">
           {message}
